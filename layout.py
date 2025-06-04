@@ -32,14 +32,14 @@ class Layout:
         tk.Button(root, text="Aktualizuj", command=self.update).grid(row=len(self.columns)+2, column=1)
         tk.Button(root, text="Pokaż ostatnie", command=self.show_last_rows).grid(row=len(self.columns)+3, column=0, columnspan=2)
 
+        self.add_custom_widgets()
+
         # Tekstowe pole wyników
         self.output = tk.Text(root, height=10, width=50)
         self.output.grid(row=len(self.columns)+4, column=0, columnspan=2)
 
-        # Połączenie z bazą danych
-        self.conn = sqlite3.connect("baza.db")
-        self.cursor = self.conn.cursor()
-        self.create_table()
+    def add_custom_widgets(self):
+        pass
 
     def create_table(self):
         self.cursor.execute("""
@@ -53,79 +53,24 @@ class Layout:
         self.conn.commit()
 
     def insert(self) -> None:
-        data = {}
-        for column in self.columns:
-            data[column] = self.entries[column].get()
-
-        try:
-            self.cursor.execute("""
-                INSERT INTO dane (id, nazwa, opis, kategoria)
-                VALUES (?, ?, ?, ?)
-            """, (data["id"], data["nazwa"], data["opis"], data["kategoria"]))
-            self.conn.commit()
-            self.output.insert(tk.END, f"Dodano: {data}\n")
-        except sqlite3.IntegrityError:
-            self.output.insert(tk.END, f"Błąd: ID={data['id']} już istnieje!\n")
+        pass
 
     def delete(self) -> None:
-        id_value = self.entries["id"].get()
-        if not id_value:
-            messagebox.showwarning("Brak ID", "Wprowadź ID do usunięcia.")
-            return
-
-        confirm = messagebox.askyesno("Potwierdzenie", f"Czy na pewno usunąć ID={id_value}?")
-        if confirm:
-            self.cursor.execute("DELETE FROM dane WHERE id = ?", (id_value,))
-            self.conn.commit()
-            if self.cursor.rowcount > 0:
-                self.output.insert(tk.END, f"Usunięto rekord ID={id_value}\n")
-            else:
-                self.output.insert(tk.END, f"Brak rekordu o ID={id_value}\n")
+        pass
 
     def find(self) -> None:
-        id_value = self.entries["id"].get()
-        self.cursor.execute("SELECT * FROM dane WHERE id = ?", (id_value,))
-        result = self.cursor.fetchone()
-        if result:
-            self.output.insert(tk.END, f"Znaleziono: {result}\n")
-        else:
-            self.output.insert(tk.END, f"Nie znaleziono rekordu o ID={id_value}\n")
+        pass
 
     def update(self) -> None:
-        data = {}
-        for column in self.columns:
-            data[column] = self.entries[column].get()
-
-        self.cursor.execute("""
-            UPDATE dane SET nazwa = ?, opis = ?, kategoria = ?
-            WHERE id = ?
-        """, (data["nazwa"], data["opis"], data["kategoria"], data["id"]))
-        self.conn.commit()
-
-        if self.cursor.rowcount > 0:
-            self.output.insert(tk.END, f"Zaktualizowano dane: {data}\n")
-        else:
-            self.output.insert(tk.END, f"Brak rekordu o ID={data['id']} do aktualizacji\n")
+        pass
 
     def show_last_rows(self) -> None:
-        count_text = self.row_count_entry.get()
-        if not count_text.isdigit():
-            self.output.insert(tk.END, "Błąd: Wpisz poprawną liczbę wierszy.\n")
-            return
-        count = int(count_text)
-
-        self.cursor.execute("SELECT * FROM dane ORDER BY ROWID DESC LIMIT ?", (count,))
-        results = self.cursor.fetchall()
-
-        self.output.insert(tk.END, f"Ostatnie {count} rekordów:\n")
-        for row in results:
-            self.output.insert(tk.END, f"{row}\n")
+        pass
 
     def requirements(self, requirements: dict[str, str]) -> dict[str, str]:
         return requirements
 
 
-# Uruchomienie aplikacji
 if __name__ == "__main__":
     root = tk.Tk()
     app = Layout(root)
